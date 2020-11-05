@@ -1,0 +1,38 @@
+https://developers.google.com/youtube/v3/docs
+https://developers.google.com/youtube/analytics/reference
+https://lifeinprogram.tistory.com/11
+https://skyblueiu.tistory.com/entry/%EA%B0%9C%EB%B0%9C%EC%9E%90%EB%AA%A8%EB%93%9C-Hello-Analytics-Google-Analytics-API-%EC%82%AC%EC%9A%A9%EB%B2%95-Javascript
+https://www.geeksforgeeks.org/youtube-data-api-for-handling-videos-set-5/?ref=rp
+https://developers.google.com/youtube/v3/docs/videos
+https://developers.google.com/youtube/v3/docs/commentThreads
+https://github.com/egbertbouman/youtube-comment-downloader
+https://stackoverflow.com/questions/36585824/how-to-get-all-comments-more-than-100-of-a-video-using-youtube-data-api-v3
+https://in-the-forest.tistory.com/2
+https://www.youtube.com/watch?v=jdqsiFw74Jk
+https://m.blog.naver.com/PostView.nhn?blogId=doublet7411&logNo=221514043955&proxyReferer=https:%2F%2Fwww.google.com%2F
+https://www.soscon.net/content/data/commu/2_Day1_1600.pdf
+https://www.notion.so/YouTube-9bbed8801c5645cca9f6165fc5f9e32c
+https://developers-kr.googleblog.com/2013/06/find-hidden-patterns-with-youtubes-new.html
+https://developers.google.com/youtube/v3/getting-started?hl=ko
+https://developers.google.com/youtube/v3/docs/videoCategories/list
+https://senticoding.tistory.com/37
+https://wikidocs.net/48627
+https://gorillaz.tistory.com/9?category=794992
+https://imyeonn.github.io/blog/web/39/
+https://jpal.tistory.com/409
+
+
+data api와 report api의 차이
+https://lifeinprogram.tistory.com/11
+
+실시간 인기 영상 정보 가져오기
+https://developers.google.com/youtube/v3/docs/videos/list
+파라미터 설정
+part = snippet
+chart = mostpopular
+legioncode = kr
+
+특정 영상 정보 가져오기
+part = snippet
+id = 해당 영상 id(https://www.youtube.com/watch?v=VZXT5OqfkJ0 -> id는 'VZXT5OqfkJ0')
+legioncode = kr

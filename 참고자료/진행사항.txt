@@ -1,0 +1,68 @@
+
+08/28 - 유튜브 프로젝트 진행상황
+현재 방법이 수작업으로 라벨링이 아닌 긍정/부정 단어장을 만들어서 프로그램으로 댓글을 라벨링 
+따라서 많은 양의 댓글들과 그 댓글들을 불용어 처리 및
+명사 추출을 해서 단어장과 비교를 해서 긍정/부정 분류
+또한 현재 문제점은 긍정/부정이 중 먼저 나온 단어를 기반으로 분류되기 때문에 처음 나온 단어가 부정이지만 댓글 내용이 
+긍정인 겨우 부정으로 처리됨 -> 긍정/부정 카운팅을 하여 가중치 조절(카운팅이 동률인 경우 방법 고민)
+
+
+08/31 - 단어장으로 라벨링 할때 find가 아닌 코사인 시밀러 함수를 이용해서 해보기(영화 추천 참조)
+
+Okt 클래스로 명사추출이 잘 안됨
+ex) 감사합니다 -> 명사 없음(감사하다를 동사로 판별)
+구독자 -> 독자
+
+명사추출이 잘 안되서 morphs로 형태소 추출
+ex) 너무 감사합니다 -> ['너무', '감사합니다']
+추출된 형태소로 단어장과 코사인 시밀러 함수 적용해보기
+
+konlpy 클래스
+https://konlpy-ko.readthedocs.io/ko/v0.4.3/morph/
+https://mr-doosun.tistory.com/22
+
+품사태그 비교표(pos 함수(텍스트에 품사 정보를 같이 반환) 사용시 에 참조)
+ https://docs.google.com/spreadsheets/d/1OGAjUvalBuX-oZvZ_-9tEfYD2gQe7hTGsgUpiiBSXI8/edit#gid=0
+
+형태소 분석기 튜닝
+https://cromboltz.tistory.com/18
+
+
+- 09/01 
+조회수 정보 크롤링 예외 처리 추가(youtube_channel_crawling.py)
+difflib의 SequenceMatcher  유사도 테스트 ->  길이로만 구분하여 이상한 결과가 나옴
+코사인 유사도 진행 중 - 단어끼리 유사도가 구해지질 않음 따라서, 긍정단어 목록, 부정단어 목록을 만들어 댓글에 추출찬 형태소 목록 비교하는 방법으로 해야 될 거 같음(단어 목록에서 단어의 개수는 형태소 개수하고 같은 크기로 설정하기)
+TF-IDF 
+from konlpy.tag import Okt
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+doc_test = []
+doc_test.append('영희 철수 배신 무료') # 댓글에 추출된 형태소 혹은 명사
+doc_test.append('최고 축하 대박 응원 무료') # 긍정 단어 목록
+doc_test.append('중단 실망 배신감 사기 분노') # 부정 단어 목록
+
+tfidf_vectorizer = TfidfVectorizer(min_df=1)
+tfidf_matrix_twitter = tfidf_vectorizer.fit_transform(doc_test)
+
+document_distance = (tfidf_matrix_twitter * tfidf_matrix_twitter.T)
+print(document_distance.toarray()) 
+
+
+- 09/11 
+ 댓글 전처리 추가하기
+댓글 맞춤법 확인하기
+ Konlpy 라이브러리 종류 별로 명사/형태소 분류 해보기(https://cleancode-ws.tistory.com/94)
+코사인 유사도 검사하여 라벨링 하기
+
+- 09/13
+ anaconda, jupyter github 연동해보기
+ NLTK 클래스 무엇인지 조사하기
+ 형태소 분석기 mecab 사용해보기
+
+- 09/27
+github으로 프로젝트 관리하기
+
+- 10/12
+ 의미연결망 분석(konlpy - Hannanum 패키지 사용)
+네트워크 그래프작성(http://blog.daum.net/geoscience/1408)

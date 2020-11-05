@@ -1,0 +1,22 @@
+프로그램 추가 설치 사항
+1. 네이버 맞춤 모듈 설치(참고사이트 및 이미지 참조) - 라벨링 정확성 향상을 위해 시도
+2. soynlp 모듈 설치(이미지 참조)
+
+확인 사항
+1. youtube_video_crawling을 사용하여 원하는 영상 댓글 정보 크롤링
+2. comment_labeling을 사용하여 댓글 라벨링 결과 확인 및 분석기 별로 비교하기(df_comment_result 확인)
+ - 최신화된 단어장(negative_words_self, positive_words_self)을 사용해주세요
+ - 크롤링 된 댓글 정보 파일 이름으로 바꿔가면서 확인!
+3. 추가적으로 확인이 완료된 댓글은 excel 파일로 저장하기!(본인이 코드를 추가하셔야 합니다!)
+
+
+====== 참고 사이트 ======
+네이버 한글 맞춤법 검사 모듈 설치 및 활용
+https://pro-jy.tistory.com/22
+https://github.com/ssut/py-hanspell
+
+형태소 분석기 비교
+https://datascienceschool.net/view-notebook/70ce46db4ced4a999c6ec349df0f4eb0/
+https://cleancode-ws.tistory.com/94
+https://konlpy-ko.readthedocs.io/ko/v0.4.3/morph/
+https://iostream.tistory.com/144
