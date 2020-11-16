@@ -33,7 +33,7 @@ path = 'chromedriver.exe'
 driver = webdriver.Chrome(path)
 
 # 크리에이터의 특정 video 페이지를 연다.
-video_url = 'https://www.youtube.com/watch?v=iRn1lIxjox0&ab_channel=%EC%9D%B4%EC%8A%A4%ED%83%80TV' #  https://www.youtube.com/watch?v=gH_w8dOGAso
+video_url = 'https://www.youtube.com/watch?v=vftVEbbgHZE&ab_channel=%EA%B0%95%ED%98%95%EC%9A%B1%EC%9D%98%EB%B3%B4%EB%93%ACTV-DogTrainerKang' #  https://www.youtube.com/watch?v=gH_w8dOGAso
 driver.get(video_url)
 
 delay = 3
@@ -159,6 +159,7 @@ file_dir = os.path.dirname(file_dir) # 상위 경로 추출 - src 폴더에 하�
 # 분석에 어긋나는 불용어구 제외 (특수문자, 의성어)
 han = re.compile(r'[ㄱ-ㅎㅏ-ㅣ!?~,".\n\r#\ufeff\u200d]')
 file_name = re.sub(han,"",video_title)
+file_name = re.sub('[\/:*?"<>|]', '', file_name)
 
 # xlsx 파일 생성
 xlxs_dir = file_dir + '/data/' + file_name + '_video_info.xlsx'
@@ -179,3 +180,5 @@ for idx in range(len(df_read_comment)):
 
 
 
+
+# %%
