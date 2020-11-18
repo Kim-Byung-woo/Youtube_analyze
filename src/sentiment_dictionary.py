@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Aug 28 01:29:23 2020
+Created on Wed Nov 18 15:54:28 2020
 
-@author: user
-
+@author: User
 """
+
 #%%
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ file_dir = os.getcwd() # 현재 파일 경로 추출
 file_dir = os.path.dirname(file_dir) # 상위 경로 추출 - 코드 파일과 단어 리스트 파일 위치가 틀려서
 
 # pos = codecs.open("./positive_words_self.txt", 'rb', encoding='UTF-8') 
-pos = codecs.open(file_dir + "/positive_words_self.txt", 'rb', encoding='UTF-8') 
+pos = codecs.open(file_dir + "/pos_pol_word.txt", 'rb', encoding='UTF-8') 
 
 while True: 
     line = pos.readline()
@@ -37,7 +37,7 @@ while True:
 
 pos.close()
  
-neg = codecs.open(file_dir + "/negative_words_self.txt", 'rb', encoding='UTF-8')
+neg = codecs.open(file_dir + "/neg_pol_word.txt", 'rb', encoding='UTF-8')
 
 while True: 
     line = neg.readline() 
@@ -49,6 +49,80 @@ while True:
     posneg.append(line) 
       
 neg.close()
+#%%
+# 긍정단어장에서 긍정 형태소 추출
+from konlpy.tag import *    
+okt = Okt()  
+
+list_positive = []
+for i in positive:
+    b = okt.morphs(i, norm = True, stem = True) # morphs: 형태소 추출
+    
+    for j in range(len(b)):
+        list_positive.append(b[j]) # 긍정 단어장의 추출된 형태소를 list에 추가
+
+# 중복 제거
+set_X = set(list_positive)
+list_positive = list(set_X)
+# 불용어 제거
+stopwords = ['의', '가', '이', '은', '들', '는', '좀', '잘', '걍', '과', '도', '를', '으로', '자', '에', '와', '한', '하다']
+temp_X = [] 
+temp_X = [word for word in list_positive if not word in stopwords]
+list_positive = temp_X # 원본 데이터에 적용
+
+
+# 분석에 어긋나는 특수문자, 의성어 제외
+han = re.compile(r'[ㄱ-ㅎㅏ-ㅣ!?~,".\n\r#\ufeff\u200d]')
+temp_X = [] # 전처리된 댓글 리스트
+for i in list_positive:
+    tokens = re.sub(han,"",str(i))
+    temp_X.append(tokens)
+list_positive = temp_X # 원본 데이터에 적용
+
+# 형태소의 길이가 1 이하인 경우 제거
+temp_X = [] # 형태소 리스트 초기화
+for idx in range(len(list_positive)):
+    length = len(list_positive[idx])
+    if not length <= 1:
+        temp_X.append(list_positive[idx])
+list_positive = temp_X # 원본 데이터에 적용
+#%%
+# 부정단어장에서 부정 형태소 추출
+from konlpy.tag import *    
+okt = Okt()  
+
+list_negative = []
+for i in negative:
+    b = okt.morphs(i, norm = True, stem = True) # morphs: 형태소 추출
+    
+    for j in range(len(b)):
+        list_negative.append(b[j]) # 긍정 단어장의 추출된 형태소를 list에 추가
+
+# 중복 제거
+set_X = set(list_negative)
+list_negative = list(set_X)
+# 불용어 제거
+stopwords = ['의', '가', '이', '은', '들', '는', '좀', '잘', '걍', '과', '도', '를', '으로', '자', '에', '와', '한', '하다']
+temp_X = [] 
+temp_X = [word for word in list_negative if not word in stopwords]
+list_negative = temp_X # 원본 데이터에 적용
+
+
+# 분석에 어긋나는 특수문자, 의성어 제외
+han = re.compile(r'[ㄱ-ㅎㅏ-ㅣ!?~,".\n\r#\ufeff\u200d]')
+temp_X = [] # 전처리된 댓글 리스트
+for i in list_negative:
+    tokens = re.sub(han,"",str(i))
+    temp_X.append(tokens)
+list_negative = temp_X # 원본 데이터에 적용
+
+# 형태소의 길이가 1 이하인 경우 제거
+temp_X = [] # 형태소 리스트 초기화
+for idx in range(len(list_negative)):
+    length = len(list_negative[idx])
+    if not length <= 1:
+        temp_X.append(list_negative[idx])
+list_negative = temp_X # 원본 데이터에 적용
 #%%
 # 크롤링한 댓글 불러오기
 xlxs_dir = file_dir + '/data/comment_crwaling_sample.xlsx'
@@ -112,12 +186,14 @@ list_prep_comment = [spell_checker.check(x).checked for x in list_prep_comment]
 #%% 형태소 추출
 from konlpy.tag import *
 
+'''
 komoran = Komoran()
 list_komoran = []
 for i in list_prep_comment:
     b = komoran.morphs(i) # morphs: 형태소 추출    
     list_komoran.append(b) # 추출된 형태소를 list에 추가
-    
+'''
+  
 okt = Okt()  
 list_okt = []
 for i in list_prep_comment:
@@ -141,6 +217,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 # 특정 단어 T가 모든 문서에 등장하는 흔한 단어라면 TF-IDF 가중치는 낮춰줍니다.
 tfidf_vectorizer = TfidfVectorizer(min_df=1) # min_df: 최소값 min_df = 2인 경우 빈도가 1번인 단어는 제외
 
+'''
 label_komoran = []
 for i in list_komoran:
     a=[]
@@ -161,12 +238,12 @@ for i in list_komoran:
         label_komoran.append('-1') # 2 = 부정
     else:
         label_komoran.append('0')
-        
+'''      
 label_okt = []
 for i in list_okt:
     a=[]
     a.append(' '.join(i))
-    a.append(' '.join(positive))
+    a.append(' '.join(list_positive))
     a.append(' '.join(negative))
     tfidf_matrix_twitter = tfidf_vectorizer.fit_transform(a)
     document_distance = (tfidf_matrix_twitter * tfidf_matrix_twitter.T)
@@ -205,11 +282,6 @@ df_comment['okt label'] = label_okt
 
 df_okt = df_comment.groupby(by = ['okt label'], as_index = False).count()
 df_komoran = df_comment.groupby(by = ['komoran label'], as_index = False).count()
-
-
-
-
-
 
 
 
