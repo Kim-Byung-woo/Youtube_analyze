@@ -87,11 +87,18 @@ for idx in range(len(list_positive)):
         temp_X.append(list_positive[idx])
 list_positive = temp_X # 원본 데이터에 적용
 
-# 댓글에서 긍정적인 의미가 아닌 단어 추가 삭제
-delwords = ['나쁘다','떳떳하다','잘못','아니다','당당하다','무너지다','남자']
+# 댓글에서 긍정적인 의미가 아닌 단어 삭제
+delwords = ['나쁘다','떳떳하다','잘못','아니다','당당하다','무너지다','남자', '밉다', '인간', '해지', '밉상']
 temp_X = [] 
 temp_X = [word for word in list_positive if not word in delwords]
 list_positive = temp_X # 원본 데이터에 적용
+
+# 긍정적인 의미 단어 추가
+joinwords = ['동안','힘내다','힘드다','팬','만나다','승승장구','아깝다','인재']
+list_positive = list_positive + joinwords
+# 중복 제거 (단어 추가 중 중복 될 수 있으므로)
+set_X = set(list_positive)
+list_positive = list(set_X)
 
 #%%
 # 부정단어장에서 부정 형태소 추출
@@ -132,13 +139,20 @@ for idx in range(len(list_negative)):
 list_negative = temp_X # 원본 데이터에 적용
 
 # 댓글에서 부정적인 의미가 아닌 단어 추가 삭제
-delwords = ['착하다','지다','인정','좋다','열심히','건강하다','웃음','훌륭하다','견디다','어떻다','일어서다','사랑','배우다','곱다','행복하다','튼튼하다']
+delwords = ['착하다','지다','인정','좋다','열심히','건강하다','웃음','훌륭하다','견디다','어떻다','일어서다','사랑','배우다','곱다','행복하다','튼튼하다', '일어나다', '버티다', '기운', '좋아하다', '만나다', '고생', '목소리']
 temp_X = [] 
 temp_X = [word for word in list_negative if not word in delwords]
 list_negative = temp_X # 원본 데이터에 적용
+
+# 부정적인 의미 단어 추가
+joinwords = ['진짜','끝물','취소','삭제','핑계','사건','나락','비겁하다','변명','구질구질','환수','차단','졸렬하다','위선','탈퇴','철판','빨리','사고','근데','매크로','취소','비겁하다','그만하다','똑바로','반성','가관','똥','혼나다','조작','못','사기꾼','해명','뺏다','의혹','신고','허위','과대','구라']
+list_negative = list_negative + joinwords
+# 중복 제거 (단어 추가 중 중복 될 수 있으므로)
+set_X = set(list_negative)
+list_negative = list(set_X)
 #%%
 # 크롤링한 댓글 불러오기
-xlxs_dir = file_dir + '/data/comment_crwaling_sample.xlsx'
+xlxs_dir = file_dir + '/data/comment_crwaling_sample_pos.xlsx'
 
 df_video_info = pd.read_excel(xlxs_dir, sheet_name = 'video')
 df_comment = pd.read_excel(xlxs_dir, sheet_name = 'comment')
@@ -162,6 +176,9 @@ print(df_comment.isnull().values.any()) # Null 값이 존재하는지 확인
 df_comment.reset_index(inplace = True) # 행제거 인덱스도 같이 삭제되어 for문을 돌리기 위해서 인덱스 컬럼 초기화
 df_comment = df_comment[['comment id', 'comment']] # 기존 인덱스 컬럼 삭제
 print('전처리 후 댓글 개수: ', len(df_comment))
+
+# 댓글 중 중복값 제거 - 한글외 다른 문자 제외 중 중복값 발생해서 중복제거를 2번 합니다.
+df_comment.drop_duplicates(subset=['comment'], inplace=True) # document 열에서 중복인 내용이 있다면 중복 제거
 
 list_prep_comment = [] # 전처리된 댓글 리스트
 list_prep_comment = df_comment['comment']
@@ -222,7 +239,7 @@ df_okt = df_comment.groupby(by = ['okt label'], as_index = False).count()
 
 df_none = df_comment[df_comment['okt label'] == 2] # 중립인 댓글 추출
 
-filename = 'test_dic.xlsx'
+filename = 'test_dic3.xlsx'
 df_none.to_excel(filename)
 
 
