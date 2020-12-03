@@ -33,7 +33,7 @@ path = 'chromedriver.exe'
 driver = webdriver.Chrome(path)
 
 # 크리에이터의 특정 video 페이지를 연다.
-video_url = 'https://www.youtube.com/watch?v=PG3Sx3D9zwM&ab_channel=%ED%8F%AC%ED%81%AC%ED%8F%AC%ED%81%AC' #  https://www.youtube.com/watch?v=gH_w8dOGAso
+video_url = 'https://www.youtube.com/watch?v=54tTYO-vU2E' #  https://www.youtube.com/watch?v=gH_w8dOGAso
 driver.get(video_url)
 
 delay = 3
