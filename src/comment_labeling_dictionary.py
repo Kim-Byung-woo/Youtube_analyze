@@ -53,7 +53,6 @@ neg.close()
 # 직접 작성한 단어장 불러오기
 xlxs_dir = file_dir + '/data/my_word_book.xlsx'
 df_my_word_book = pd.read_excel(xlxs_dir)
-
 #%%
 # 긍정단어장에서 긍정 형태소 추출
 from konlpy.tag import *    
@@ -103,7 +102,7 @@ list_positive = temp_X # 원본 데이터에 적용
 delwords = []
 delwords = list(df_my_word_book['del_poswords'])
 # 삭제할 긍정 단어 중복 제거 (삭제할 긍정 단어 중 중복이 있을수 있으므로)
-set_words = set(stopwords)
+set_words = set(delwords)
 delwords = list(set_words)
 delwords = [x for x in delwords if str(x) != 'nan']
 # 댓글에서 긍정적인 의미가 아닌 단어 삭제
@@ -115,7 +114,7 @@ list_positive = temp_X # 원본 데이터에 적용
 joinwords = []
 joinwords = list(df_my_word_book['add_poswords'])
 # 추가할 긍정 단어 중복 제거 (추가할 긍정 단어 중 중복이 있을수 있으므로)
-set_words = set(stopwords)
+set_words = set(joinwords)
 joinwords = list(set_words)
 joinwords = [x for x in joinwords if str(x) != 'nan']
 # 긍정적인 의미 단어 추가
@@ -123,7 +122,6 @@ list_positive = list_positive + joinwords
 # 중복 제거 (단어 추가 중 중복 될 수 있으므로)
 set_X = set(list_positive)
 list_positive = list(set_X)
-
 #%%
 # 부정단어장에서 부정 형태소 추출
 from konlpy.tag import *    
@@ -172,7 +170,7 @@ list_negative = temp_X # 원본 데이터에 적용
 delwords = []
 delwords = list(df_my_word_book['del_negwords'])
 # 삭제할 부정 단어 중복 제거 (삭제할 부정 단어 중 중복이 있을수 있으므로)
-set_words = set(stopwords)
+set_words = set(delwords)
 delwords = list(set_words)
 delwords = [x for x in delwords if str(x) != 'nan']
 # 댓글에서 부정적인 의미가 아닌 단어 추가 삭제
@@ -184,18 +182,17 @@ list_negative = temp_X # 원본 데이터에 적용
 joinwords = []
 joinwords = list(df_my_word_book['add_negwords'])
 # 추가할 부정 단어 중복 제거 (추가할 부정 단어 중 중복이 있을수 있으므로)
-set_words = set(stopwords)
+set_words = set(joinwords)
 joinwords = list(set_words)
 joinwords = [x for x in joinwords if str(x) != 'nan']
 # 부정적인 의미 단어 추가
 list_negative = list_negative + joinwords
-
 # 중복 제거 (단어 추가 중 중복 될 수 있으므로)
 set_X = set(list_negative)
 list_negative = list(set_X)
 #%%
 # 크롤링한 댓글 불러오기
-xlxs_dir = file_dir + '/data/comment_crwaling_sample.xlsx'
+xlxs_dir = file_dir + '/data/comment_crwaling_sample_pos.xlsx'
 
 df_video_info = pd.read_excel(xlxs_dir, sheet_name = 'video')
 df_comment = pd.read_excel(xlxs_dir, sheet_name = 'comment')
@@ -227,8 +224,8 @@ list_prep_comment = [] # 전처리된 댓글 리스트
 list_prep_comment = df_comment['comment']
 #%%
 # 네이버 맞춤법 검사 후 수정 - 상당히 오래 걸림
-from hanspell import spell_checker
-list_prep_comment = [spell_checker.check(x).checked for x in list_prep_comment]
+#from hanspell import spell_checker
+#list_prep_comment = [spell_checker.check(x).checked for x in list_prep_comment]
 #%% 형태소 추출
 from konlpy.tag import *
 
@@ -237,7 +234,6 @@ list_okt = []
 for i in list_prep_comment:
     b = okt.morphs(i, norm = True, stem = True) # morphs: 형태소 추출
     list_okt.append(b) # 추출된 형태소를 list에 추가
-
 #%%
 list_label = []
 list_pos_text = []
@@ -282,7 +278,7 @@ df_okt = df_comment.groupby(by = ['okt label'], as_index = False).count()
 
 df_none = df_comment[df_comment['okt label'] == 2] # 중립인 댓글 추출
 
-filename = '단어장 2차 수정.xlsx'
+filename = '단어장 4차 수정.xlsx'
 df_none.to_excel(filename)
 
 
