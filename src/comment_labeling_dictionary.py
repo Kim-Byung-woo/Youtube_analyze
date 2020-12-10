@@ -82,12 +82,19 @@ temp_X = [word for word in list_positive if not word in stopwords]
 list_positive = temp_X # 원본 데이터에 적용
 
 # 분석에 어긋나는 특수문자, 의성어 제외
-han = re.compile(r'[ㄱ-ㅎㅏ-ㅣ!?~,".\n\r#\ufeff\u200d]')
+han = re.compile('[^ 가-힣]+') # 한글(자음과 모음이 따로 있는 경우도 포함)과 띄어쓰기를 제외한 모든 글자
 temp_X = [] # 전처리된 댓글 리스트
 for i in list_positive:
-    tokens = re.sub(han,"",str(i))
+    tokens = re.sub(han,"",str(i)) # 한글(자음과 모음이 따로 있는 경우도 포함)과 띄어쓰기를 제외한 모든 글자
     temp_X.append(tokens)
 list_positive = temp_X # 원본 데이터에 적용
+
+
+# 공백만 있는 경우 제거
+temp_X = [] # 전처리된 댓글 리스트
+temp_X = [d.strip() for d in list_positive]
+list_positive = [x for x in temp_X if str(x) != '']
+
 
 # 형태소의 길이가 1 이하인 경우 제거
 temp_X = [] # 형태소 리스트 초기화
@@ -151,12 +158,18 @@ temp_X = [word for word in list_negative if not word in stopwords]
 list_negative = temp_X # 원본 데이터에 적용
 
 # 분석에 어긋나는 특수문자, 의성어 제외
-han = re.compile(r'[ㄱ-ㅎㅏ-ㅣ!?~,".\n\r#\ufeff\u200d]')
+han = re.compile('[^ 가-힣]+') # 한글(자음과 모음이 따로 있는 경우도 포함)과 띄어쓰기를 제외한 모든 글자
 temp_X = [] # 전처리된 댓글 리스트
 for i in list_negative:
-    tokens = re.sub(han,"",str(i))
+    tokens = re.sub(han,"",str(i)) # 한글(자음과 모음이 따로 있는 경우도 포함)과 띄어쓰기를 제외한 모든 글자 제거
     temp_X.append(tokens)
 list_negative = temp_X # 원본 데이터에 적용
+
+# 공백만 있는 경우 제거
+temp_X = [] # 전처리된 댓글 리스트
+temp_X = [d.strip() for d in list_negative]
+list_negative = [x for x in temp_X if str(x) != '']
+
 
 # 형태소의 길이가 1 이하인 경우 제거
 temp_X = [] # 형태소 리스트 초기화
@@ -205,7 +218,7 @@ df_comment.drop_duplicates(subset=['comment'], inplace=True) # document 열에�
 # 댓글 중 한글과 공백을 제외하고 모두 제거
 df_comment['comment'] = df_comment['comment'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
 # 댓글 중 공백만 있는 경우 제거
-df_comment['comment'] = df_comment['comment'].str.strip() 
+df_comment['comment'] = df_comment['comment'].str.strip() # strip: 문자열에서 양쪽 끝에 있는 공백과 \n 기호를 삭제
 # 댓글 중 모두 제거된 데이터는 Nan값으로 대체
 df_comment['comment'].replace('', np.nan, inplace=True)
 
@@ -239,21 +252,26 @@ list_label = []
 list_pos_text = []
 list_neg_text = []
 
+
 for idx in range(len(list_okt)):
     pos_score = 0
     list_text = []
     for text in list_positive: # 긍정 단어 목록을 1개씩 불러옵니다.
-        if text in list_okt[idx]: # 추출된 형태소 목록에 긍정 단어를 찾았을 경우
-            pos_score += 1
-            list_text.append(text) # 찾은 긍정 단어 누적
+        cnt = list_okt[idx].count(text) # 긍정 단어가 형태소 목록에 몇개 있는지 파악
+        pos_score += cnt 
+        
+        if cnt != 0: # 추출된 형태소 목록에 긍정 단어를 찾았을 경우
+            list_text.append(text) # 찾은 긍정 단어 누적            
     list_pos_text.append(list_text) # 찾은 긍정 단어 목록 저장
     
     neg_score = 0
     list_text = []
     for text in list_negative: # 부정 단어 목록을 1개씩 불러옵니다.
-        if text in list_okt[idx]: # 추출된 형태소 목록에 부정 단어를 찾았을 경우
-            neg_score += 1
-            list_text.append(text) # 찾은 부정 단어 누적
+        cnt = list_okt[idx].count(text) # 긍정 단어가 형태소 목록에 몇개 있는지 파악
+        neg_score += cnt 
+        
+        if cnt != 0: # 추출된 형태소 목록에 긍정 단어를 찾았을 경우
+            list_text.append(text) # 찾은 긍정 단어 누적            
     list_neg_text.append(list_text) # 찾은 부정 단어 목록 저장
 
     # 0: negative 1: positve 2: none
@@ -274,11 +292,12 @@ df_comment['pos text'] = list_pos_text # 찾은 긍정 단어 목록
 df_comment['neg text'] = list_neg_text # 찾은 부정 단어 목록
 df_comment['okt label'] = list_label # 라벨링 결과
 df_okt = df_comment.groupby(by = ['okt label'], as_index = False).count()
-
-
-df_none = df_comment[df_comment['okt label'] == 2] # 중립인 댓글 추출
-
-filename = '단어장 4차 수정.xlsx'
+#%%
+filename = '부정 단어장 수정.xlsx'
+df_comment.to_excel(filename)
+#%%
+df_none = df_comment[df_comment['okt label'] == 1] # 중립인 댓글 추출
+filename = '긍정_긍정 단어장 수정.xlsx'
 df_none.to_excel(filename)
 
 
