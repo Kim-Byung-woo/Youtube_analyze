@@ -39,21 +39,27 @@ import re
 import time
 from collections import Counter
 from wordcloud import WordCloud
-from konlpy.tag import Twitter
+from konlpy.tag import *
+import os
 
 def get_noun(comment_txt):
-    twitter = Twitter()
+    okt = Okt() 
     noun = []
     
     if len(comment_txt)>0:
-        tw = twitter.pos(comment_txt)
+        tw = okt.pos(comment_txt)
         for i,j in tw:
             if j == 'Noun':
                 noun.append(i)
     return noun
 #%%
 # load file
-xlxs_dir = '이스타TV_video_info.xlsx'
+# 데이터셋 로드
+file_dir = os.getcwd() # 현재 파일 경로 추출
+file_dir = os.path.dirname(file_dir) # 상위 경로 추출
+
+xlxs_dir = file_dir + '/data/엘론_video_info.xlsx'
+
 df_read_video_info = pd.read_excel(xlxs_dir, sheet_name = 'video')
 df_read_comment = pd.read_excel(xlxs_dir, sheet_name = 'comment')
 
@@ -90,8 +96,6 @@ df_comment_result = pd.DataFrame(comment_result, columns=["comment"])
 
 # 명사 추출
 df_comment_result['token'] = df_comment_result['comment'].apply(lambda x: get_noun(x))
- 
-
 
 noun_list = []
 for i in range(len(df_comment_result)):
@@ -125,9 +129,109 @@ plt.title('단어 빈도수 시각화')
 plt.show()
 #%%
 #wordcloud
-wc = WordCloud(font_path='font/NanumBarunGothic.ttf',background_color='white', width=800, height=600)
+wc = WordCloud(font_path = file_dir + '/font/NanumBarunGothic.ttf',background_color='white', width=800, height=600)
 cloud = wc.generate_from_frequencies(dict(tags))
 plt.figure(figsize=(10, 8))
 plt.axis('off')
 plt.imshow(cloud)
 plt.show()
+#%%
+# 댓글 감성분석 시각화
+# 데이터셋 로드
+xlxs_dir = file_dir + '/data/감성분석 모델 비교 결과.xlsx'
+df_sentiment_result = pd.read_excel(xlxs_dir)
+
+comment_cnt = len(df_sentiment_result) - 1 # 총 댓글 개수, -1은 컬령명 제외
+
+# 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy_review'] > 70) & (df_sentiment_result['label_review'] == 0)]
+neg_cnt_by_review = len(df_temp) # 영화 리뷰 모델 기반 긍정 댓글 개수
+
+# 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy_review'] > 70) & (df_sentiment_result['label_review'] == 1)]
+pos_cnt_by_review = len(df_temp) # 영화 리뷰 모델 기반 부정 댓글 개수
+
+# 정확성이 70% 미만인 댓글 추출
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy_review'] < 70)]
+non_cnt_by_review = len(df_temp) # 영화 리뷰 모델 기반 중립 댓글 개수
+
+# pie chart
+## 데이터 준비
+labels = ['Positive Comment','Negative Comment','Neutrality Comment'] ## 라벨
+frequency = [pos_cnt_by_review, neg_cnt_by_review, non_cnt_by_review] ## 빈도
+colors = ['#87ceeb', '#ff9999', '#d395d0']
+
+fig = plt.figure(figsize=(8,8)) ## 캔버스 생성
+fig.set_facecolor('white') ## 캔버스 배경색을 하얀색으로 설정
+ax = fig.add_subplot() ## 프레임 생성
+ 
+pie = ax.pie(frequency, ## 파이차트 출력
+       startangle = 90, ## 시작점을 90도(degree)로 지정
+       explode = (0.05 , 0, 0), # 간격 설정
+       #shadow=True, # 그림자 설정
+       counterclock = False, ## 시계 방향으로 그린다.
+       autopct = lambda p : '{:.2f}%'.format(p), ## 퍼센티지 출력
+       colors = colors, ## 색상 지정
+       wedgeprops = {'edgecolor':'k','linewidth': 1} ## 테두리 속성 지정
+       )
+ 
+plt.legend(pie[0],labels) ## 범례 표시
+plt.show()
+
+# 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy_comment'] > 70) & (df_sentiment_result['label_comment'] == 0)]
+neg_cnt_by_comment = len(df_temp) # 영화 리뷰 모델 기반 긍정 댓글 개수
+
+# 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy_comment'] > 70) & (df_sentiment_result['label_comment'] == 1)]
+pos_cnt_by_comment = len(df_temp) # 영화 리뷰 모델 기반 부정 댓글 개수
+
+# 정확성이 70% 미만인 댓글 추출
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy_comment'] < 70)]
+non_cnt_by_comment = len(df_temp) # 영화 리뷰 모델 기반 중립 댓글 개수
+
+# pie chart
+## 데이터 준비
+frequency = [pos_cnt_by_comment, neg_cnt_by_comment, non_cnt_by_comment] ## 빈도
+
+fig = plt.figure(figsize=(8,8)) ## 캔버스 생성
+fig.set_facecolor('white') ## 캔버스 배경색을 하얀색으로 설정
+ax = fig.add_subplot() ## 프레임 생성
+ 
+pie = ax.pie(frequency, ## 파이차트 출력
+       startangle = 90, ## 시작점을 90도(degree)로 지정
+       explode = (0.05 , 0, 0), # 간격 설정
+       #shadow=True, # 그림자 설정
+       counterclock = False, ## 시계 방향으로 그린다.
+       autopct = lambda p : '{:.2f}%'.format(p), ## 퍼센티지 출력
+       colors = colors, ## 색상 지정
+       wedgeprops = {'edgecolor':'k','linewidth': 1} ## 테두리 속성 지정
+       )
+ 
+plt.legend(pie[0],labels) ## 범례 표시
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
