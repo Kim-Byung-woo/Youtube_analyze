@@ -17,19 +17,14 @@ from konlpy.tag import *
 file_dir = os.getcwd() # 현재 파일 경로 추출
 file_dir = os.path.dirname(file_dir) # 상위 경로 추출 - 코드 파일과 단어 리스트 파일 위치가 틀려서
 #%%
-
-
-
+'''
 plt.rc('font', size = 20, family='gulim')
 plt.plot(df_read_channel_info['daily subscribe count'], 'r-', label= '일일 구독자 변화')
 plt.plot(df_read_channel_info['daily view count'], 'g-', label='일일 조회수')
 
 plt.xticks([0, 1, 2])
-
 plt.show()
-
-
-
+'''
 #%%
 
 # 일일 구독자수에 따른 조회수 시각화
@@ -209,7 +204,7 @@ temp_X = [word for word in list_morphs if not word in str(stopwords)]
 list_morphs = temp_X # 원본 데이터에 적용
 
 counts = Counter(list_morphs) # 추출된 명사 빈도수 확인
-most_morphs = counts.most_common(30) # 빈도수 상위 30개 추출
+most_morphs = counts.most_common(15) # 빈도수 상위 15개 추출
 df_anal = pd.DataFrame(list(most_morphs), columns=['morphs', 'counts']) # 튜플 타입인 most_morphs를 Dataframe으로 형변환
 
 # 단어별 평균 조회수 구하기
@@ -282,7 +277,7 @@ temp_X = [word for word in list_morphs if not word in str(stopwords)]
 list_morphs = temp_X # 원본 데이터에 적용
 
 counts = Counter(list_morphs) # 추출된 명사 빈도수 확인
-most_morphs = counts.most_common(30) # 빈도수 상위 30개 추출
+most_morphs = counts.most_common(15) # 빈도수 상위 30개 추출
 df_anal = pd.DataFrame(list(most_morphs), columns=['morphs', 'counts']) # 튜플 타입인 most_morphs를 Dataframe으로 형변환
 
 # 단어별 평균 조회수 구하기

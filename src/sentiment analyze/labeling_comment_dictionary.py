@@ -13,15 +13,20 @@ import re
 import time
 import codecs
 import os
+
+file_dir = os.getcwd() # 현재 파일 경로 추출
+
+'''
+현재 파일 경로가 src/sentiment analyze/에 위치하기 때문에 
+data 파일 경로를 알기 위해서는 상위 경로 추출을 2번 실행 합니다.
+'''
+file_dir = os.path.dirname(file_dir) # 상위 경로 추출
+file_dir = os.path.dirname(file_dir) # 상위 경로 추출
 #%%
 ## 파일에서 단어를 불러와 posneg리스트를 만드는 코드
-
 positive = [] 
 negative = [] 
 posneg = []
-
-file_dir = os.getcwd() # 현재 파일 경로 추출
-file_dir = os.path.dirname(file_dir) # 상위 경로 추출 - 코드 파일과 단어 리스트 파일 위치가 틀려서
 
 # pos = codecs.open("./positive_words_self.txt", 'rb', encoding='UTF-8') 
 pos = codecs.open(file_dir + "/data/pos_pol_word.txt", 'rb', encoding='UTF-8') 
@@ -117,7 +122,7 @@ temp_X = []
 temp_X = [word for word in list_positive if not word in delwords]
 list_positive = temp_X # 원본 데이터에 적용
 
-# 기존 단어장에서  추가할 긍정 단어 불러오기
+# 기존 단어장에서 추가할 긍정 단어 불러오기
 joinwords = []
 joinwords = list(df_my_word_book['add_poswords'])
 # 추가할 긍정 단어 중복 제거 (추가할 긍정 단어 중 중복이 있을수 있으므로)
@@ -205,7 +210,12 @@ set_X = set(list_negative)
 list_negative = list(set_X)
 #%%
 # 크롤링한 댓글 불러오기
-xlxs_dir = file_dir + '/data/comment_crwaling_sample_pos.xlsx'
+'''
+comment_crwaling_sample_pos: 긍정 댓글 샘플
+comment_crwaling_sample_neg: 부정 댓글 샘플
+'''
+xlxs_dir = file_dir + '/data/comment_crwaling_sample_neg.xlsx'
+# xlxs_dir = file_dir + '/data/comment_crwaling_sample_pos.xlsx'
 
 df_video_info = pd.read_excel(xlxs_dir, sheet_name = 'video')
 df_comment = pd.read_excel(xlxs_dir, sheet_name = 'comment')
@@ -293,11 +303,19 @@ df_comment['neg text'] = list_neg_text # 찾은 부정 단어 목록
 df_comment['okt label'] = list_label # 라벨링 결과
 df_okt = df_comment.groupby(by = ['okt label'], as_index = False).count()
 #%%
-filename = '부정 단어장 수정.xlsx'
-df_comment.to_excel(filename)
+# 라벨링 결과 저장
+df_comment.to_excel(file_dir + '/data/result_label' +'.xlsx')
 #%%
-df_none = df_comment[df_comment['okt label'] == 1] # 중립인 댓글 추출
-filename = '긍정_긍정 단어장 수정.xlsx'
+# 라벨링 결과 비교
+'''
+comment_crwaling_sample_pos: 긍정 댓글 샘플
+comment_crwaling_sample_neg: 부정 댓글 샘플
+
+각각의 긍정/부정 댓글 샘플을 라벨링하여 추출된 형태소와 라벨링 결과를 비교하여
+단어장을 수정 및 라벨링 정확도를 향상 시킵니다.
+'''
+df_none = df_comment[df_comment['okt label'] == 1] # 긍정인 댓글 추출
+filename = '긍정 단어장 수정.xlsx'
 df_none.to_excel(filename)
 
 

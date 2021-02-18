@@ -136,23 +136,24 @@ plt.axis('off')
 plt.imshow(cloud)
 plt.show()
 #%%
-# 댓글 감성분석 시각화
+# 영화 리뷰 기반 모델 감성분석 시각화
+
 # 데이터셋 로드
-xlxs_dir = file_dir + '/data/감성분석 모델 비교 결과.xlsx'
+xlxs_dir = file_dir + '/data/movie_base_result_wiki.xlsx'
 df_sentiment_result = pd.read_excel(xlxs_dir)
 
 comment_cnt = len(df_sentiment_result) - 1 # 총 댓글 개수, -1은 컬령명 제외
 
 # 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
-df_temp = df_sentiment_result[(df_sentiment_result['accuracy_review'] > 70) & (df_sentiment_result['label_review'] == 0)]
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy'] > 70) & (df_sentiment_result['label'] == 0)]
 neg_cnt_by_review = len(df_temp) # 영화 리뷰 모델 기반 긍정 댓글 개수
 
 # 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
-df_temp = df_sentiment_result[(df_sentiment_result['accuracy_review'] > 70) & (df_sentiment_result['label_review'] == 1)]
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy'] > 70) & (df_sentiment_result['label'] == 1)]
 pos_cnt_by_review = len(df_temp) # 영화 리뷰 모델 기반 부정 댓글 개수
 
 # 정확성이 70% 미만인 댓글 추출
-df_temp = df_sentiment_result[(df_sentiment_result['accuracy_review'] < 70)]
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy'] < 70)]
 non_cnt_by_review = len(df_temp) # 영화 리뷰 모델 기반 중립 댓글 개수
 
 # pie chart
@@ -177,18 +178,24 @@ pie = ax.pie(frequency, ## 파이차트 출력
  
 plt.legend(pie[0],labels) ## 범례 표시
 plt.show()
+#%%
+# 유튜브 댓글 기반 모델 감성분석 시각화
+
+# 데이터셋 로드
+xlxs_dir = file_dir + '/data/comment_base_result_wiki.xlsx'
+df_sentiment_result = pd.read_excel(xlxs_dir)
 
 # 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
-df_temp = df_sentiment_result[(df_sentiment_result['accuracy_comment'] > 70) & (df_sentiment_result['label_comment'] == 0)]
-neg_cnt_by_comment = len(df_temp) # 영화 리뷰 모델 기반 긍정 댓글 개수
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy'] > 70) & (df_sentiment_result['label'] == 0)]
+neg_cnt_by_comment = len(df_temp) # 라벨링 댓글 모델 기반 긍정 댓글 개수
 
 # 정확성이 70% 보다 크고 라벨링 0(부정)인 댓글 추출
-df_temp = df_sentiment_result[(df_sentiment_result['accuracy_comment'] > 70) & (df_sentiment_result['label_comment'] == 1)]
-pos_cnt_by_comment = len(df_temp) # 영화 리뷰 모델 기반 부정 댓글 개수
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy'] > 70) & (df_sentiment_result['label'] == 1)]
+pos_cnt_by_comment = len(df_temp) # 라벨링 댓글 모델 기반 부정 댓글 개수
 
 # 정확성이 70% 미만인 댓글 추출
-df_temp = df_sentiment_result[(df_sentiment_result['accuracy_comment'] < 70)]
-non_cnt_by_comment = len(df_temp) # 영화 리뷰 모델 기반 중립 댓글 개수
+df_temp = df_sentiment_result[(df_sentiment_result['accuracy'] < 70)]
+non_cnt_by_comment = len(df_temp) # 라벨링 댓글 모델 기반 중립 댓글 개수
 
 # pie chart
 ## 데이터 준비
